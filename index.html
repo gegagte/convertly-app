@@ -4,324 +4,423 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Convertly — Image Converter</title>
+<meta name="theme-color" content="#090914">
+<title>Convertly — Premium Image Studio</title>
 <style>
 :root {
-  color-scheme: dark;
-  font-family: Arial, sans-serif;
+  --bg:#090914;--panel:#121222;--panel2:#19192c;
+  --text:#f7f5ff;--muted:#9695b1;--border:#292842;
+  --purple:#9670ff;--pink:#d16cff;--green:#55e6ad;
 }
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  min-height: 100vh;
-  background: #0b1020;
-  color: #f5f6ff;
-  padding: 28px 16px;
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif}
+body.light{--bg:#f4f3fa;--panel:#fff;--panel2:#f0edfa;--text:#171428;--muted:#77738c;--border:#e2dff0}
+button,input,select{font:inherit}
+button{cursor:pointer}
+#loader{
+ position:fixed;inset:0;z-index:99;background:#080811;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;
+ transition:opacity .7s,visibility .7s;
 }
-main { max-width: 900px; margin: auto; }
-header { text-align: center; margin: 25px 0 35px; }
-.logo { color: #a78bfa; font-size: 15px; font-weight: bold; letter-spacing: 3px; }
-h1 { font-size: clamp(34px, 7vw, 54px); margin: 12px 0; }
-header p { color: #a7b0ca; }
-.panel {
-  background: #151d32;
-  border: 1px solid #293653;
-  border-radius: 20px;
-  padding: 22px;
-  margin-bottom: 18px;
+#loader.hide{opacity:0;visibility:hidden}
+.loader-logo{font-size:clamp(36px,8vw,65px);font-weight:900;letter-spacing:5px;
+ background:linear-gradient(90deg,#fff,#a98aff,#e78aff);
+ background-clip:text;-webkit-background-clip:text;color:transparent;
+ animation:logoIn 1.3s ease both}
+.loader-glow{width:180px;height:90px;position:absolute;background:#8c52ff;
+ filter:blur(80px);opacity:.55;animation:pulse 1.8s infinite alternate}
+.loader-bar{width:190px;height:4px;background:#27223e;border-radius:10px;margin-top:35px;overflow:hidden}
+.loader-bar:after{content:"";display:block;width:45%;height:100%;background:#a477ff;animation:loading 1.5s ease-in-out infinite}
+.loader-caption{color:#9992b5;font-size:11px;letter-spacing:4px;margin-top:15px}
+@keyframes logoIn{from{opacity:0;transform:scale(.8);filter:blur(12px)}to{opacity:1;transform:scale(1);filter:blur(0)}}
+@keyframes pulse{to{transform:scale(1.5);opacity:.9}}
+@keyframes loading{from{transform:translateX(-120%)}to{transform:translateX(340%)}}
+
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);padding:25px 17px;display:flex;flex-direction:column}
+.brand{font-size:24px;font-weight:900;letter-spacing:2px;padding:5px 12px 35px}
+.brand span{color:var(--purple)}
+.nav-label{font-size:10px;color:var(--muted);letter-spacing:2px;padding:10px 12px}
+.nav-btn{width:100%;border:0;background:transparent;color:var(--muted);text-align:left;padding:13px 14px;border-radius:11px;margin:3px 0;font-size:14px}
+.nav-btn:hover,.nav-btn.active{background:var(--panel2);color:var(--text)}
+.nav-btn.active{box-shadow:inset 3px 0 var(--purple)}
+.sidebar-bottom{margin-top:auto;border-top:1px solid var(--border);padding-top:18px}
+.main{flex:1;min-width:0;padding:30px clamp(16px,4vw,48px);max-width:1500px;margin:0 auto;width:100%}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:35px}
+.topbar small{color:var(--muted)}
+.top-actions{display:flex;gap:9px}
+.icon-btn{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:10px;padding:10px 13px}
+h1{font-size:clamp(27px,4vw,39px);margin:0 0 9px}
+h2{font-size:20px;margin:0 0 8px}
+p{color:var(--muted);line-height:1.6}
+.hero{background:linear-gradient(115deg,#21183f,#17142c 55%,#251536);border:1px solid #443268;border-radius:22px;padding:30px;margin-bottom:23px;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:#9b63ff;filter:blur(100px);opacity:.23;right:-30px;top:-80px}
+.hero>*{position:relative;z-index:1}
+.hero p{max-width:570px;color:#c4bddb}
+.pill{display:inline-block;border:1px solid #674a9d;color:#d8c6ff;border-radius:30px;padding:6px 11px;font-size:11px;margin-bottom:15px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin-bottom:24px}
+.stat,.card{background:var(--panel);border:1px solid var(--border);border-radius:17px;padding:20px}
+.stat small{color:var(--muted)}
+.stat strong{display:block;font-size:25px;margin-top:10px}
+.card{margin-bottom:18px}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px}
+.dropzone{border:2px dashed #5c4b8c;background:var(--panel2);border-radius:16px;text-align:center;padding:35px 15px;transition:.2s}
+.dropzone.over{border-color:var(--pink);background:#35234b}
+.drop-icon{font-size:34px;margin-bottom:10px}
+.dropzone strong{display:block;font-size:17px}
+.dropzone p{font-size:13px;margin:8px 0}
+input[type=file]{max-width:100%;margin-top:12px;color:var(--muted)}
+.settings{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin-top:20px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:9px}
+.field select,.field input[type=number]{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text)}
+.field input[type=range]{width:100%;accent-color:var(--purple)}
+.primary{background:linear-gradient(100deg,#8158ed,#bd65e8);border:0;color:white;padding:14px 20px;border-radius:11px;font-weight:bold}
+.secondary{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:11px 15px;border-radius:10px}
+.primary:disabled{opacity:.5;cursor:not-allowed}
+.full{width:100%;margin-top:20px}
+.status{text-align:center;color:var(--muted);font-size:13px;margin-top:15px}
+.result-list{display:grid;gap:12px}
+.result{display:grid;grid-template-columns:75px minmax(0,1fr) auto;gap:13px;align-items:center;padding:12px;background:var(--panel2);border:1px solid var(--border);border-radius:13px}
+.result img{width:75px;height:75px;object-fit:cover;border-radius:9px;background:var(--bg)}
+.result strong{font-size:13px;overflow-wrap:anywhere}
+.result p{font-size:12px;margin:6px 0}
+.download{display:inline-block;background:#7653d9;color:white;text-decoration:none;padding:10px 12px;border-radius:9px;font-size:12px}
+.empty{text-align:center;padding:25px;color:var(--muted);font-size:13px}
+.page{display:none}.page.active{display:block}
+.feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.feature{padding:20px;background:var(--panel2);border:1px solid var(--border);border-radius:14px}
+.feature b{display:block;margin:8px 0}
+.feature span{font-size:25px}
+.setting-row{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:15px 0;border-bottom:1px solid var(--border)}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}
+.mobile-brand{display:none}
+
+@media(max-width:800px){
+ .sidebar{width:70px;padding:18px 8px}
+ .brand{font-size:0;padding:8px 10px 30px}.brand span{font-size:24px}
+ .nav-label,.nav-btn .nav-text,.sidebar-bottom .nav-text{display:none}
+ .nav-btn{text-align:center;font-size:20px;padding:13px 5px}
+ .main{padding:20px 14px}
+ .settings{grid-template-columns:1fr 1fr}
+ .grid{grid-template-columns:1fr 1fr}
 }
-.drop {
-  border: 2px dashed #6553b8;
-  background: #1b2340;
-  border-radius: 15px;
-  padding: 30px 15px;
-  text-align: center;
+@media(max-width:480px){
+ .settings,.grid,.feature-grid{grid-template-columns:1fr}
+ .hero{padding:22px}
+ .result{grid-template-columns:58px minmax(0,1fr)}
+ .result img{width:58px;height:58px}
+ .result .download{grid-column:2;justify-self:start}
+ .topbar{margin-bottom:22px}
 }
-.drop strong { display: block; font-size: 19px; margin-bottom: 8px; }
-input, select, button {
-  font: inherit;
-}
-input[type=file] { max-width: 100%; margin-top: 15px; }
-.settings {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  gap: 18px;
-  margin-top: 22px;
-}
-label { display: block; color: #cbd3e8; font-size: 14px; }
-select, input[type=number] {
-  display: block;
-  width: 100%;
-  margin-top: 8px;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #394969;
-  background: #0e172a;
-  color: white;
-}
-input[type=range] { width: 100%; margin-top: 15px; }
-button, .download {
-  border: 0;
-  background: #8064ed;
-  color: white;
-  border-radius: 11px;
-  padding: 13px 20px;
-  font-weight: bold;
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-block;
-}
-button:disabled { opacity: .45; cursor: not-allowed; }
-.primary { width: 100%; margin-top: 22px; }
-#status { color: #c2c9dc; margin-top: 15px; text-align: center; }
-#results { display: grid; gap: 13px; }
-.result {
-  display: grid;
-  grid-template-columns: 85px 1fr;
-  gap: 15px;
-  align-items: center;
-  background: #1b2740;
-  border: 1px solid #30405f;
-  border-radius: 13px;
-  padding: 12px;
-}
-.result img {
-  width: 85px;
-  height: 85px;
-  object-fit: cover;
-  border-radius: 9px;
-  background: #0b1020;
-}
-.result p { color: #aab5d0; font-size: 13px; margin: 7px 0; overflow-wrap: anywhere; }
-.result .download { padding: 9px 12px; font-size: 13px; }
-.small { color: #96a3c1; font-size: 13px; }
-footer { text-align: center; color: #7f8ba9; font-size: 12px; margin: 30px 0; }
 </style>
 </head>
 <body>
-<main>
-<header>
-  <div class="logo">CONVERTLY</div>
-  <h1>Vos images. <span style="color:#a78bfa">Votre format.</span></h1>
-  <p>Convertissez, compressez et redimensionnez vos images gratuitement.</p>
-</header>
 
-<section class="panel">
-  <div class="drop">
-    <strong>Choisissez vos images</strong>
-    <span class="small">Jusqu'à 20 images · Traitement directement sur votre appareil</span>
-    <br>
+<div id="loader">
+ <div class="loader-glow"></div>
+ <div class="loader-logo">CONVERTLY</div>
+ <div class="loader-bar"></div>
+ <div class="loader-caption">YOUR IMAGE STUDIO</div>
+</div>
+
+<div class="app">
+<aside class="sidebar">
+ <div class="brand">CONVERT<span>LY</span></div>
+ <div class="nav-label">ESPACE DE TRAVAIL</div>
+ <button class="nav-btn active" data-page="dashboard">⌂ <span class="nav-text">Dashboard</span></button>
+ <button class="nav-btn" data-page="converter">▧ <span class="nav-text">Convertisseur</span></button>
+ <button class="nav-btn" data-page="history">◷ <span class="nav-text">Historique</span></button>
+ <div class="nav-label">AUTRE</div>
+ <button class="nav-btn" data-page="features">✦ <span class="nav-text">Fonctionnalités</span></button>
+ <button class="nav-btn" data-page="settings">⚙ <span class="nav-text">Paramètres</span></button>
+ <div class="sidebar-bottom">
+  <button class="nav-btn" data-page="settings">ⓘ <span class="nav-text">À propos</span></button>
+ </div>
+</aside>
+
+<main class="main">
+ <div class="topbar">
+  <div><small>CONVERTLY / <span id="breadcrumb">DASHBOARD</span></small></div>
+  <div class="top-actions">
+   <button class="icon-btn" id="themeBtn" title="Changer de thème">☼</button>
+   <button class="icon-btn" data-go="converter">＋ Nouveau</button>
+  </div>
+ </div>
+
+ <section class="page active" id="dashboard">
+  <div class="hero">
+   <span class="pill">✦ IMAGE STUDIO</span>
+   <h1>Bienvenue sur Convertly.</h1>
+   <p>Un espace simple et puissant pour convertir, compresser et redimensionner tes images. Tout se passe directement sur ton appareil.</p>
+   <button class="primary" data-go="converter">Ouvrir le convertisseur →</button>
+  </div>
+  <div class="grid">
+   <div class="stat"><small>Images converties</small><strong id="statCount">0</strong></div>
+   <div class="stat"><small>Économies réalisées</small><strong id="statSaved">0 Ko</strong></div>
+   <div class="stat"><small>Dernière session</small><strong id="statSession">0</strong></div>
+  </div>
+  <div class="card">
+   <div class="card-head"><h2>Ton espace de travail</h2><span class="pill">GRATUIT</span></div>
+   <div class="feature-grid">
+    <div class="feature"><span>🖼️</span><b>Conversion multiple</b><p>Convertis jusqu'à 20 images à la fois.</p></div>
+    <div class="feature"><span>⚡</span><b>Compression</b><p>Réduis la taille de tes fichiers.</p></div>
+    <div class="feature"><span>📐</span><b>Redimensionnement</b><p>Adapte la largeur de tes images.</p></div>
+    <div class="feature"><span>🔒</span><b>Confidentialité</b><p>Les images restent sur ton appareil.</p></div>
+   </div>
+  </div>
+ </section>
+
+ <section class="page" id="converter">
+  <h1>Convertisseur</h1>
+  <p>Transforme tes images en quelques secondes.</p>
+  <div class="card">
+   <div class="dropzone" id="dropzone">
+    <div class="drop-icon">☁️</div>
+    <strong>Glisse tes images ici</strong>
+    <p>ou sélectionne-les depuis ton appareil · 20 maximum</p>
     <input id="files" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+   </div>
+   <div class="settings">
+    <div class="field"><label>FORMAT DE SORTIE</label>
+     <select id="format"><option value="image/webp">WebP</option><option value="image/jpeg">JPG</option><option value="image/png">PNG</option></select>
+    </div>
+    <div class="field"><label>LARGEUR MAXIMALE (PX)</label>
+     <input id="width" type="number" min="1" max="12000" value="1920">
+    </div>
+    <div class="field"><label>QUALITÉ : <span id="qualityValue">85</span>%</label>
+     <input id="quality" type="range" min="10" max="100" value="85">
+    </div>
+   </div>
+   <button class="primary full" id="convertBtn">✦ Convertir mes images</button>
+   <div class="status" id="status">Sélectionne des images pour commencer.</div>
   </div>
-
-  <div class="settings">
-    <label>Format de sortie
-      <select id="format">
-        <option value="image/webp">WebP</option>
-        <option value="image/jpeg">JPG</option>
-        <option value="image/png">PNG</option>
-      </select>
-    </label>
-    <label>Largeur maximale (pixels)
-      <input id="width" type="number" min="1" max="12000" value="1920">
-    </label>
-    <label>Qualité : <span id="qualityValue">85</span>%
-      <input id="quality" type="range" min="10" max="100" value="85">
-    </label>
+  <div class="card">
+   <div class="card-head"><h2>Résultats</h2><button class="secondary" id="clearBtn">Tout effacer</button></div>
+   <p id="summary" class="small">Tes images converties apparaîtront ici.</p>
+   <div class="result-list" id="results"><div class="empty">Aucun résultat pour le moment.</div></div>
   </div>
+ </section>
 
-  <button class="primary" id="convert">Convertir mes images</button>
-  <div id="status" role="status">Sélectionnez vos images pour commencer.</div>
-</section>
+ <section class="page" id="history">
+  <h1>Historique</h1>
+  <p>Les conversions effectuées pendant cette session.</p>
+  <div class="card">
+   <div class="card-head"><h2>Activité récente</h2><button class="secondary" id="clearHistory">Effacer</button></div>
+   <div id="historyList" class="empty">Aucune conversion enregistrée.</div>
+  </div>
+ </section>
 
-<section class="panel">
-  <h2>Résultats</h2>
-  <p class="small" id="summary">Vos images converties apparaîtront ici.</p>
-  <div id="results"></div>
-</section>
+ <section class="page" id="features">
+  <h1>Fonctionnalités</h1>
+  <p>Les outils disponibles dans Convertly.</p>
+  <div class="feature-grid">
+   <div class="feature"><span>🔄</span><b>JPG, PNG et WebP</b><p>Change le format de tes images.</p></div>
+   <div class="feature"><span>📦</span><b>Traitement par lots</b><p>Jusqu'à 20 images en une seule session.</p></div>
+   <div class="feature"><span>⚡</span><b>Compression</b><p>Contrôle la qualité des formats JPG et WebP.</p></div>
+   <div class="feature"><span>📏</span><b>Redimensionnement</b><p>Réduis la largeur tout en gardant les proportions.</p></div>
+   <div class="feature"><span>👁️</span><b>Aperçu</b><p>Visualise chaque image convertie.</p></div>
+   <div class="feature"><span>🔐</span><b>Traitement local</b><p>Pas d'envoi des images vers un serveur.</p></div>
+  </div>
+ </section>
 
-<footer>Convertly · Gratuit · Sans compte · Vos images restent sur votre appareil</footer>
+ <section class="page" id="settings">
+  <h1>Paramètres</h1>
+  <p>Personnalise ton expérience Convertly.</p>
+  <div class="card">
+   <h2>Apparence</h2>
+   <div class="setting-row"><div><b>Thème clair / sombre</b><p>Choisis l'apparence de ton espace.</p></div><button class="secondary" id="themeSetting">Changer</button></div>
+   <div class="setting-row"><div><b>Version</b><p>Convertly V3 · Image Studio</p></div><span class="pill">V3.0</span></div>
+  </div>
+  <div class="card">
+   <h2>Confidentialité</h2>
+   <p>Les images sélectionnées sont traitées dans ton navigateur. Elles ne sont pas envoyées à un serveur par Convertly. L'historique est limité à la session en cours.</p>
+  </div>
+ </section>
+ <footer>CONVERTLY · IMAGE STUDIO · V3.0</footer>
 </main>
+</div>
 
 <script>
-const filesInput = document.getElementById('files');
-const formatInput = document.getElementById('format');
-const widthInput = document.getElementById('width');
-const qualityInput = document.getElementById('quality');
-const qualityValue = document.getElementById('qualityValue');
-const convertButton = document.getElementById('convert');
-const statusBox = document.getElementById('status');
-const results = document.getElementById('results');
-const summary = document.getElementById('summary');
+const $ = id => document.getElementById(id);
+let historyItems = [];
+let totalConverted = 0;
+let totalSaved = 0;
+let objectUrls = [];
 
-qualityInput.addEventListener('input', () => {
-  qualityValue.textContent = qualityInput.value;
+function showPage(name){
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ $(name).classList.add('active');
+ document.querySelectorAll('.nav-btn[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===name));
+ $('breadcrumb').textContent=name.toUpperCase();
+}
+document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.go)));
+
+function toggleTheme(){
+ document.body.classList.toggle('light');
+}
+$('themeBtn').addEventListener('click',toggleTheme);
+$('themeSetting').addEventListener('click',toggleTheme);
+
+window.addEventListener('load',()=>{
+ setTimeout(()=>$('loader').classList.add('hide'),1700);
 });
 
-function formatSize(bytes) {
-  if (bytes < 1024) return bytes + ' octets';
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' Ko';
-  return (bytes / (1024 * 1024)).toFixed(2) + ' Mo';
-}
+$('quality').addEventListener('input',()=> $('qualityValue').textContent=$('quality').value);
 
-function extensionFor(type) {
-  return type === 'image/jpeg' ? 'jpg' :
-         type === 'image/png' ? 'png' : 'webp';
+function sizeText(bytes){
+ if(bytes<1024)return bytes+' octets';
+ if(bytes<1024*1024)return (bytes/1024).toFixed(1)+' Ko';
+ return (bytes/1024/1024).toFixed(2)+' Mo';
 }
-
-function loadImage(file) {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => resolve({ img, url });
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error('Image illisible'));
-    };
-    img.src = url;
-  });
+function extension(type){
+ return type==='image/jpeg'?'jpg':type==='image/png'?'png':'webp';
 }
-
-function canvasBlob(canvas, type, quality) {
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(blob => {
-      if (blob) resolve(blob);
-      else reject(new Error('Conversion impossible'));
-    }, type, quality);
-  });
+function loadImage(file){
+ return new Promise((resolve,reject)=>{
+  const url=URL.createObjectURL(file);
+  const img=new Image();
+  img.onload=()=>resolve({img,url});
+  img.onerror=()=>{URL.revokeObjectURL(url);reject(Error('Image illisible'));};
+  img.src=url;
+ });
 }
-
-filesInput.addEventListener('change', () => {
-  const count = filesInput.files.length;
-  if (count > 20) {
-    filesInput.value = '';
-    statusBox.textContent = 'Maximum : 20 images par conversion.';
-    return;
-  }
-  statusBox.textContent = count
-    ? count + ' image(s) sélectionnée(s).'
-    : 'Sélectionnez vos images pour commencer.';
+function makeBlob(canvas,type,quality){
+ return new Promise((resolve,reject)=>{
+  canvas.toBlob(blob=>blob?resolve(blob):reject(Error('Conversion impossible')),type,quality);
+ });
+}
+function updateStats(){
+ $('statCount').textContent=totalConverted;
+ $('statSaved').textContent=sizeText(Math.max(0,totalSaved));
+ $('statSession').textContent=historyItems.length;
+}
+function addError(name,message){
+ const row=document.createElement('div');
+ row.className='result';
+ const details=document.createElement('div');
+ const title=document.createElement('strong');
+ title.textContent=name;
+ const msg=document.createElement('p');
+ msg.textContent=message;
+ details.append(title,msg);
+ row.append(details);
+ $('results').append(row);
+}
+function addResult(file,blob,url,name,w,h){
+ const row=document.createElement('article');
+ row.className='result';
+ const img=document.createElement('img');
+ img.src=url;img.alt='Aperçu '+name;
+ const details=document.createElement('div');
+ const title=document.createElement('strong');
+ title.textContent=name;
+ const info=document.createElement('p');
+ info.textContent=sizeText(file.size)+' → '+sizeText(blob.size)+' · '+w+' × '+h+' px';
+ const link=document.createElement('a');
+ link.className='download';link.href=url;link.download=name;link.textContent='Télécharger';
+ details.append(title,info);
+ row.append(img,details,link);
+ $('results').append(row);
+}
+function renderHistory(){
+ const box=$('historyList');
+ box.replaceChildren();
+ if(!historyItems.length){box.textContent='Aucune conversion enregistrée.';box.className='empty';return;}
+ box.className='result-list';
+ historyItems.slice().reverse().forEach(item=>{
+  const row=document.createElement('div');row.className='result';
+  const details=document.createElement('div');
+  const title=document.createElement('strong');title.textContent=item.name;
+  const info=document.createElement('p');info.textContent=item.format+' · '+item.time+' · '+item.size;
+  details.append(title,info);row.append(details);box.append(row);
+ });
+}
+$('files').addEventListener('change',()=>{
+ const count=$('files').files.length;
+ if(count>20){$('files').value='';$('status').textContent='Maximum : 20 images à la fois.';return;}
+ $('status').textContent=count?count+' image(s) sélectionnée(s).':'Sélectionne des images pour commencer.';
 });
 
-convertButton.addEventListener('click', async () => {
-  const files = Array.from(filesInput.files);
-  if (!files.length) {
-    statusBox.textContent = 'Choisissez au moins une image.';
-    return;
-  }
-  if (files.length > 20) {
-    statusBox.textContent = 'Maximum : 20 images.';
-    return;
-  }
-
-  const maxWidth = Number(widthInput.value);
-  if (!Number.isInteger(maxWidth) || maxWidth < 1 || maxWidth > 12000) {
-    statusBox.textContent = 'Entrez une largeur entre 1 et 12000 pixels.';
-    return;
-  }
-
-  const type = formatInput.value;
-  const quality = Number(qualityInput.value) / 100;
-  const extension = extensionFor(type);
-
-  results.replaceChildren();
-  summary.textContent = 'Conversion en cours…';
-  convertButton.disabled = true;
-
-  let success = 0;
-  let totalBefore = 0;
-  let totalAfter = 0;
-
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    statusBox.textContent = 'Conversion ' + (i + 1) + ' sur ' + files.length + '…';
-
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      addError(file.name, 'Format non pris en charge.');
-      continue;
-    }
-
-    let loaded;
-    try {
-      loaded = await loadImage(file);
-      const { img, url } = loaded;
-      const ratio = Math.min(1, maxWidth / img.naturalWidth);
-      const canvas = document.createElement('canvas');
-      canvas.width = Math.max(1, Math.round(img.naturalWidth * ratio));
-      canvas.height = Math.max(1, Math.round(img.naturalHeight * ratio));
-
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('Canvas indisponible');
-      if (type === 'image/jpeg') {
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-      }
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-      const blob = await canvasBlob(canvas, type, quality);
-      const outputUrl = URL.createObjectURL(blob);
-      const baseName = file.name.replace(/\.[^.]+$/, '') || 'image';
-      const outputName = baseName + '-convertly.' + extension;
-
-      addResult(file, blob, outputUrl, outputName, canvas.width, canvas.height);
-      success++;
-      totalBefore += file.size;
-      totalAfter += blob.size;
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      if (loaded) URL.revokeObjectURL(loaded.url);
-      addError(file.name, error.message || 'Erreur de conversion.');
-    }
-  }
-
-  summary.textContent = success + ' image(s) convertie(s) avec succès.';
-  statusBox.textContent = 'Terminé ! ' + success + ' / ' + files.length + ' réussie(s).';
-  if (success) {
-    summary.textContent += ' Taille totale : ' + formatSize(totalBefore) +
-      ' → ' + formatSize(totalAfter) + '.';
-  }
-  convertButton.disabled = false;
+const drop=$('dropzone');
+drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('over');});
+drop.addEventListener('dragleave',()=>drop.classList.remove('over'));
+drop.addEventListener('drop',e=>{
+ e.preventDefault();drop.classList.remove('over');
+ const files=Array.from(e.dataTransfer.files);
+ if(files.length>20){$('status').textContent='Maximum : 20 images.';return;}
+ const allowed=files.filter(f=>['image/jpeg','image/png','image/webp'].includes(f.type));
+ const transfer=new DataTransfer();
+ allowed.forEach(f=>transfer.items.add(f));
+ $('files').files=transfer.files;
+ $('status').textContent=allowed.length+' image(s) sélectionnée(s).';
 });
 
-function addResult(file, blob, url, name, width, height) {
-  const card = document.createElement('article');
-  card.className = 'result';
+$('convertBtn').addEventListener('click',async()=>{
+ const files=Array.from($('files').files);
+ if(!files.length){$('status').textContent='Choisis au moins une image.';return;}
+ if(files.length>20){$('status').textContent='Maximum : 20 images.';return;}
+ const maxWidth=Number($('width').value);
+ if(!Number.isInteger(maxWidth)||maxWidth<1||maxWidth>12000){
+  $('status').textContent='Largeur autorisée : entre 1 et 12000 pixels.';return;
+ }
+ const type=$('format').value;
+ const quality=Number($('quality').value)/100;
+ $('convertBtn').disabled=true;
+ $('results').replaceChildren();
+ $('summary').textContent='Conversion en cours…';
+ objectUrls.forEach(URL.revokeObjectURL);objectUrls=[];
+ let success=0,before=0,after=0;
 
-  const img = document.createElement('img');
-  img.src = url;
-  img.alt = 'Aperçu de ' + name;
+ for(let i=0;i<files.length;i++){
+  const file=files[i];
+  $('status').textContent='Conversion '+(i+1)+' / '+files.length+'…';
+  if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
+   addError(file.name,'Format non pris en charge.');continue;
+  }
+  let loaded;
+  try{
+   loaded=await loadImage(file);
+   const img=loaded.img;
+   const ratio=Math.min(1,maxWidth/img.naturalWidth);
+   const canvas=document.createElement('canvas');
+   canvas.width=Math.max(1,Math.round(img.naturalWidth*ratio));
+   canvas.height=Math.max(1,Math.round(img.naturalHeight*ratio));
+   const ctx=canvas.getContext('2d');
+   if(!ctx)throw Error('Canvas indisponible');
+   if(type==='image/jpeg'){ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);}
+   ctx.drawImage(img,0,0,canvas.width,canvas.height);
+   const blob=await makeBlob(canvas,type,quality);
+   const url=URL.createObjectURL(blob);objectUrls.push(url);
+   const name=(file.name.replace(/\.[^.]+$/,'')||'image')+'-convertly.'+extension(type);
+   addResult(file,blob,url,name,canvas.width,canvas.height);
+   success++;before+=file.size;after+=blob.size;
+   totalConverted++;totalSaved+=file.size-blob.size;
+   historyItems.push({name,format:extension(type).toUpperCase(),time:new Date().toLocaleTimeString('fr-BE'),size:sizeText(blob.size)});
+  }catch(err){
+   addError(file.name,err.message||'Erreur de conversion.');
+  }finally{
+   if(loaded)URL.revokeObjectURL(loaded.url);
+  }
+ }
+ $('summary').textContent=success+' image(s) convertie(s) · '+sizeText(before)+' → '+sizeText(after);
+ $('status').textContent='Terminé : '+success+' / '+files.length+' réussite(s).';
+ if(!success)$('summary').textContent='Aucune image convertie.';
+ $('convertBtn').disabled=false;
+ updateStats();renderHistory();
+});
 
-  const details = document.createElement('div');
-  const title = document.createElement('strong');
-  title.textContent = name;
-
-  const info = document.createElement('p');
-  info.textContent = formatSize(file.size) + ' → ' + formatSize(blob.size) +
-    ' · ' + width + ' × ' + height + ' px';
-
-  const link = document.createElement('a');
-  link.className = 'download';
-  link.href = url;
-  link.download = name;
-  link.textContent = 'Télécharger';
-
-  details.append(title, info, link);
-  card.append(img, details);
-  results.append(card);
-}
-
-function addError(name, message) {
-  const card = document.createElement('article');
-  card.className = 'result';
-  const details = document.createElement('div');
-  const title = document.createElement('strong');
-  title.textContent = name;
-  const info = document.createElement('p');
-  info.textContent = message;
-  details.append(title, info);
-  card.append(details);
-  results.append(card);
-}
+$('clearBtn').addEventListener('click',()=>{
+ objectUrls.forEach(URL.revokeObjectURL);objectUrls=[];
+ $('results').innerHTML='<div class="empty">Aucun résultat pour le moment.</div>';
+ $('summary').textContent='Résultats effacés.';
+ $('files').value='';
+ $('status').textContent='Prêt pour une nouvelle conversion.';
+});
+$('clearHistory').addEventListener('click',()=>{
+ historyItems=[];renderHistory();updateStats();
+});
+updateStats();
 </script>
 </body>
 </html>
