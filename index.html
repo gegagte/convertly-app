@@ -4,407 +4,515 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#090914">
-<meta name="description" content="Convertly - Convertis, compresse et transforme tes images gratuitement.">
+<meta name="theme-color" content="#090817">
 <title>Convertly — Image Studio</title>
 <style>
-:root{
-  --bg:#090914;--panel:#111122;--panel2:#17172c;--line:#292944;
-  --text:#f5f3ff;--muted:#9998b7;--purple:#9874ff;--pink:#e16bff;
-  --green:#6ee7b7;--radius:20px;
+:root {
+  --bg:#090817;--panel:#15132b;--panel2:#1d1940;
+  --line:#302a53;--text:#f7f4ff;--muted:#aaa3c8;
+  --purple:#9062ff;--pink:#dc55ed;--cyan:#67e8f9;
 }
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(ellipse at 70% -10%,#34205c 0%,transparent 38%),var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif;min-height:100vh}
+body{margin:0;background:radial-gradient(ellipse at top right,#30205a,transparent 45%),var(--bg);color:var(--text);font-family:Arial,sans-serif}
 button,input,select{font:inherit}
-button{cursor:pointer}
+button{border:0;border-radius:11px;padding:11px 15px;background:linear-gradient(110deg,var(--purple),var(--pink));color:white;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}
+.ghost{background:#252142;border:1px solid var(--line)}
+#splash{position:fixed;inset:0;background:#090817;z-index:100;display:grid;place-items:center;transition:.5s}
+.splash-content{text-align:center}
+.logo{font-size:38px;font-weight:900;letter-spacing:-2px}
+.logo span{color:#b794ff}
+.loader{height:5px;width:190px;background:#282344;margin:22px auto;border-radius:10px;overflow:hidden}
+.loader:after{content:"";display:block;width:40%;height:100%;background:linear-gradient(90deg,var(--purple),var(--pink));animation:loading 1s infinite}
+@keyframes loading{from{transform:translateX(-110%)}to{transform:translateX(280%)}}
 .app{display:flex;min-height:100vh}
-.sidebar{width:245px;background:#0d0d1b;border-right:1px solid var(--line);padding:25px 17px;display:flex;flex-direction:column;gap:25px}
-.logo{font-size:25px;font-weight:900;letter-spacing:-1px;padding:8px 10px}
-.logo span{color:var(--purple)}
-.logo small{display:block;font-size:9px;letter-spacing:3px;color:var(--muted);margin-top:5px}
-.nav-title{font-size:10px;color:#777694;letter-spacing:2px;padding:0 12px}
-.nav{display:grid;gap:7px}
-.nav button{background:transparent;color:var(--muted);border:0;text-align:left;padding:13px;border-radius:12px;font-size:13px}
-.nav button.active,.nav button:hover{background:#282044;color:white}
-.nav button.active{box-shadow:inset 3px 0 var(--purple)}
-.sidebar-bottom{margin-top:auto;border:1px solid var(--line);border-radius:15px;padding:15px;color:var(--muted);font-size:12px;line-height:1.6}
-.main{flex:1;min-width:0;padding:30px clamp(15px,4vw,55px);max-width:1500px;margin:auto;width:100%}
-.topbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:32px}
-.eyebrow{color:var(--purple);font-size:11px;letter-spacing:2px;font-weight:800}
-h1{font-size:clamp(27px,4vw,42px);margin:9px 0 7px;letter-spacing:-1.5px}
-.subtitle{color:var(--muted);font-size:14px}
-.status{border:1px solid #285b4c;background:#10291f;color:var(--green);padding:9px 13px;border-radius:30px;font-size:11px;white-space:nowrap}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-bottom:22px}
-.stat,.panel,.tool-card{background:linear-gradient(145deg,#17172b,#10101d);border:1px solid var(--line);border-radius:var(--radius)}
-.stat{padding:18px}
-.stat span{color:var(--muted);font-size:12px}
-.stat strong{display:block;font-size:25px;margin-top:9px}
-.workspace{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(290px,.85fr);gap:18px;align-items:start}
-.panel{padding:22px;min-width:0}
-.panel h2{font-size:17px;margin:0 0 7px}
-.panel p{font-size:12px;color:var(--muted);line-height:1.6}
-.dropzone{border:1.5px dashed #66529b;background:linear-gradient(140deg,#21183c,#151528);border-radius:18px;min-height:205px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:25px;transition:.2s}
-.dropzone.drag{border-color:var(--pink);background:#2b1b42;transform:scale(1.01)}
-.upload-icon{width:54px;height:54px;border-radius:17px;background:#38275d;display:grid;place-items:center;font-size:25px;margin-bottom:13px}
-.dropzone strong{font-size:16px}
-.dropzone small{color:var(--muted);margin-top:8px}
-.primary{border:0;background:linear-gradient(110deg,var(--purple),var(--pink));color:white;padding:12px 18px;border-radius:11px;font-weight:800;margin-top:17px;box-shadow:0 8px 25px #8055d433}
-.secondary{background:#22213a;border:1px solid #383654;color:white;padding:10px 13px;border-radius:10px}
-.file-list{display:grid;gap:9px;margin-top:15px}
-.file-item{display:flex;align-items:center;gap:11px;background:#19192b;padding:10px;border-radius:12px;min-width:0}
-.file-item img{width:42px;height:42px;object-fit:cover;border-radius:8px}
-.file-info{min-width:0;flex:1}
-.file-info strong{display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.file-info small{color:var(--muted);font-size:10px}
-.remove{background:transparent;border:0;color:#ff8d9c;font-size:18px}
-.field{margin-top:16px}
-.field label{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:#d8d4f0;margin-bottom:8px}
-.field output{color:var(--pink)}
-input[type="range"]{width:100%;accent-color:var(--purple)}
-input[type="text"],input[type="number"],select{width:100%;background:#0d0d1b;border:1px solid #33334f;border-radius:10px;color:white;padding:11px;outline:none}
-input:focus,select:focus{border-color:var(--purple)}
-select{color-scheme:dark}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.divider{height:1px;background:var(--line);margin:20px 0}
-.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
-.actions button{flex:1}
-.results{margin-top:20px}
-.result{background:#19192b;border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:10px}
-.result-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.result img{width:100%;max-height:190px;object-fit:contain;background:#0b0b15;border-radius:9px;margin-top:10px}
-.result small{color:var(--muted)}
-.download{color:#c6aaff;text-decoration:none;font-size:12px;font-weight:bold}
-.notice{font-size:11px;color:var(--muted);line-height:1.6;margin-top:15px}
-.hidden{display:none!important}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#27213e;border:1px solid #69529a;padding:12px 18px;border-radius:12px;z-index:20;font-size:13px;box-shadow:0 10px 40px #0008}
-.mobile-menu{display:none}
-@media(max-width:850px){
- .sidebar{width:68px;padding:17px 8px;align-items:center}
- .logo{font-size:19px;padding:8px 0}.logo small,.nav-title,.nav button span,.sidebar-bottom{display:none}
- .nav{width:100%}.nav button{text-align:center;padding:13px 4px;font-size:18px}
- .workspace{grid-template-columns:1fr}
- .main{padding:22px 15px}
-}
-@media(max-width:500px){
- .stats{grid-template-columns:1fr 1fr}
- .stat:last-child{grid-column:span 2}
- .topbar{align-items:flex-start}
- .status{font-size:9px;padding:7px}
- .panel{padding:15px}
- .grid2{grid-template-columns:1fr 1fr}
-}
+.sidebar{width:225px;background:#0d0b1d;border-right:1px solid var(--line);padding:25px 15px;display:flex;flex-direction:column;gap:30px}
+.brand{font-size:25px;font-weight:900;padding:0 10px}
+.brand span{color:#b794ff}
+.nav{display:grid;gap:8px}
+.nav button{text-align:left;background:transparent;color:var(--muted)}
+.nav button.active,.nav button:hover{background:#211b3d;color:white}
+.main{padding:28px;width:100%;max-width:1450px;margin:auto}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;gap:15px}
+.top h1{margin:0;font-size:28px}
+.top p{color:var(--muted);margin:7px 0}
+.pill{border:1px solid #514276;border-radius:30px;padding:9px 13px;color:#d8c8ff;font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-bottom:18px}
+.stat,.card{background:linear-gradient(145deg,#191630,#111024);border:1px solid var(--line);border-radius:17px;padding:18px}
+.stat strong{display:block;font-size:25px;margin-top:7px}
+.small{font-size:12px;color:var(--muted)}
+.layout{display:grid;grid-template-columns:1.25fr .75fr;gap:17px}
+.card h2{font-size:17px;margin:0 0 15px}
+.drop{border:2px dashed #65538e;border-radius:15px;padding:32px 12px;text-align:center;background:#17142d}
+.drop.over{border-color:#c4a7ff;background:#28204a}
+.drop h3{margin:10px 0}
+.drop p{font-size:13px;color:var(--muted)}
+.symbol{font-size:35px}
+.field{display:grid;gap:7px;margin-top:13px}
+.field label{font-size:12px;color:var(--muted)}
+input[type=text],input[type=number],select{width:100%;background:#0d0b1d;color:white;border:1px solid var(--line);padding:10px;border-radius:9px}
+input[type=range]{width:100%;accent-color:#a78bfa}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.actions,.presets,.checks{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
+.presets button{font-size:11px;padding:8px 10px}
+.checks label{font-size:12px;color:var(--muted)}
+.filelist{display:grid;gap:9px;margin-top:13px}
+.fileitem{display:flex;align-items:center;gap:10px;padding:9px;background:#0e0c20;border:1px solid var(--line);border-radius:11px}
+.thumb{width:45px;height:45px;object-fit:cover;border-radius:8px}
+.fileinfo{flex:1;min-width:0}
+.fileinfo b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}
+.fileinfo span{font-size:11px;color:var(--muted)}
+.fileitem button{padding:8px;font-size:11px}
+.preview{min-height:210px;background:#090817;border-radius:13px;display:grid;place-items:center;overflow:hidden}
+.preview img{max-width:100%;max-height:350px;object-fit:contain}
+.empty{padding:25px;text-align:center;color:var(--muted)}
+.compare{position:relative;max-width:100%;overflow:hidden}
+.compare>img{display:block;max-width:100%;max-height:350px}
+.after{position:absolute;top:0;left:0;width:50%;height:100%;overflow:hidden;border-right:2px solid white}
+.after img{height:100%;max-width:none;object-fit:contain;object-position:left center}
+.page{display:none}
+.page.active{display:block}
+.history-row{padding:13px;border:1px solid var(--line);border-radius:10px;margin-bottom:9px;background:#100e22;font-size:13px}
+.note{font-size:11px;color:#8e87ad;line-height:1.5;margin-top:20px}
+@media(max-width:850px){.sidebar{width:75px;padding:18px 7px}.brand{font-size:0;text-align:center}.brand:after{content:"C";font-size:25px}.nav button{font-size:0;text-align:center;padding:13px 3px}.nav button:first-letter{font-size:18px}.layout{grid-template-columns:1fr}.main{padding:20px}}
+@media(max-width:560px){.sidebar{position:fixed;bottom:0;left:0;right:0;width:auto;height:65px;z-index:5;padding:6px;background:#0d0b1d}.brand{display:none}.nav{display:flex;justify-content:space-around;gap:2px}.nav button{flex:1;font-size:10px;padding:10px 2px}.nav button:first-letter{font-size:10px}.main{padding:17px 12px 85px}.top h1{font-size:23px}.pill{display:none}.stats{gap:7px}.stat{padding:11px}.stat strong{font-size:19px}.stat .small{font-size:10px}}
 </style>
 </head>
 <body>
+
+<div id="splash">
+ <div class="splash-content">
+  <div class="logo">Convert<span>ly</span></div>
+  <p class="small">Ton studio de conversion intelligent</p>
+  <div class="loader"></div>
+  <p class="small">Préparation de ton espace...</p>
+ </div>
+</div>
+
 <div class="app">
 <aside class="sidebar">
-  <div class="logo">C<span>onvertly</span><small>IMAGE STUDIO</small></div>
-  <div class="nav-title">WORKSPACE</div>
-  <nav class="nav">
-    <button class="active">◈ <span>Studio</span></button>
-    <button onclick="document.getElementById('files').click()">＋ <span>Importer</span></button>
-    <button onclick="document.getElementById('results').scrollIntoView({behavior:'smooth'})">▤ <span>Résultats</span></button>
-    <button onclick="resetAll()">↻ <span>Réinitialiser</span></button>
-  </nav>
-  <div class="sidebar-bottom">✦ CONVERTLY STUDIO<br>Traitement local et privé.<br>Jusqu'à 20 images par session.</div>
+ <div class="brand">Convert<span>ly</span></div>
+ <nav class="nav">
+  <button class="active" data-page="studio">◈ Studio</button>
+  <button data-page="history">◷ Historique</button>
+  <button data-page="settings">⚙ Réglages</button>
+ </nav>
 </aside>
 
 <main class="main">
-  <header class="topbar">
-    <div>
-      <div class="eyebrow">CREATIVE IMAGE WORKSPACE</div>
-      <h1>Image Studio<span style="color:var(--purple)">.</span></h1>
-      <div class="subtitle">Transforme tes images. À ta façon.</div>
-    </div>
-    <div class="status">● Traitement local</div>
-  </header>
 
-  <section class="stats">
-    <div class="stat"><span>Images importées</span><strong id="statFiles">0</strong></div>
-    <div class="stat"><span>Images converties</span><strong id="statDone">0</strong></div>
-    <div class="stat"><span>Économie de taille</span><strong id="statSaved">0 KB</strong></div>
-  </section>
+<section class="page active" id="studio">
+ <div class="top">
+  <div><h1>Studio créatif</h1><p>Convertis et optimise tes images.</p></div>
+  <span class="pill">✦ CONVERTLY PRO</span>
+ </div>
 
-  <section class="workspace">
-    <div class="panel">
-      <h2>01 — Importer tes images</h2>
-      <p>Glisse tes fichiers dans la zone ou sélectionne-les depuis ton appareil.</p>
-      <div class="dropzone" id="dropzone">
-        <div class="upload-icon">↥</div>
-        <strong>Glisse tes images ici</strong>
-        <small>JPG, JPEG, PNG et WebP · 20 images maximum</small>
-        <button class="primary" id="chooseBtn">Choisir des images</button>
-        <input type="file" id="files" accept="image/jpeg,image/png,image/webp" multiple hidden>
-      </div>
-      <div class="file-list" id="fileList"></div>
+ <div class="stats">
+  <div class="stat"><span class="small">Images ajoutées</span><strong id="count">0 / 20</strong></div>
+  <div class="stat"><span class="small">Conversions terminées</span><strong id="done">0</strong></div>
+  <div class="stat"><span class="small">Économies estimées</span><strong id="saved">0 KB</strong></div>
+ </div>
 
-      <div class="divider"></div>
-      <h2>02 — Format et dimensions</h2>
-      <div class="grid2">
-        <div class="field"><label>Format de sortie</label>
-          <select id="format"><option value="image/webp">WebP</option><option value="image/jpeg">JPG</option><option value="image/png">PNG</option></select>
-        </div>
-        <div class="field"><label>Mode de redimensionnement</label>
-          <select id="resizeMode"><option value="none">Original</option><option value="contain">Adapter dans les dimensions</option><option value="cover">Recadrer pour remplir</option></select>
-        </div>
-        <div class="field"><label>Largeur max. (px)</label><input type="number" id="width" min="1" max="10000" placeholder="Ex : 1920"></div>
-        <div class="field"><label>Hauteur max. (px)</label><input type="number" id="height" min="1" max="10000" placeholder="Ex : 1080"></div>
-      </div>
-      <div class="field"><label>Qualité <output id="qualityOut">85%</output></label><input type="range" id="quality" min="10" max="100" value="85"></div>
+ <div class="layout">
+ <div class="card">
+  <h2>① Importer tes images</h2>
+  <div class="drop" id="drop">
+   <div class="symbol">☁</div>
+   <h3>Glisse tes images ici</h3>
+   <p>Jusqu'à 20 images simultanément</p>
+   <button id="choose">Choisir des images</button>
+   <input id="files" type="file" accept="image/*" multiple hidden>
+  </div>
+  <div class="filelist" id="filelist"></div>
+  <div class="actions">
+   <button id="convert" disabled>Convertir ↗</button>
+   <button class="ghost" id="zip" disabled>Télécharger ZIP</button>
+   <button class="ghost" id="clear">Effacer</button>
+  </div>
+  <p class="note">Traitement local : tes images restent dans ton navigateur.</p>
+ </div>
 
-      <div class="divider"></div>
-      <h2>03 — Ajustements visuels</h2>
-      <div class="grid2">
-        <div class="field"><label>Rotation</label><select id="rotation"><option value="0">Aucune</option><option value="90">90°</option><option value="180">180°</option><option value="270">270°</option></select></div>
-        <div class="field"><label>Fond JPG</label><input type="color" id="bgColor" value="#ffffff" style="height:42px;width:100%;background:#0d0d1b;border:1px solid #33334f;border-radius:10px"></div>
-      </div>
-      <div class="grid2">
-        <label class="field"><input type="checkbox" id="flipH"> Retourner horizontalement</label>
-        <label class="field"><input type="checkbox" id="flipV"> Retourner verticalement</label>
-      </div>
-      <div class="field"><label>Noir et blanc</label><input type="checkbox" id="grayscale"></div>
-      <div class="field"><label>Sépia</label><input type="checkbox" id="sepia"></div>
-      <div class="field"><label>Luminosité <output id="brightnessOut">100%</output></label><input type="range" id="brightness" min="0" max="200" value="100"></div>
-      <div class="field"><label>Contraste <output id="contrastOut">100%</output></label><input type="range" id="contrast" min="0" max="200" value="100"></div>
-      <div class="field"><label>Saturation <output id="saturationOut">100%</output></label><input type="range" id="saturation" min="0" max="200" value="100"></div>
-      <div class="field"><label>Flou <output id="blurOut">0 px</output></label><input type="range" id="blur" min="0" max="10" value="0"></div>
+ <div class="card">
+  <h2>② Paramètres</h2>
+  <div class="field"><label>Format de sortie</label>
+   <select id="format">
+    <option value="image/webp">WebP</option>
+    <option value="image/jpeg">JPG</option>
+    <option value="image/png">PNG</option>
+   </select>
+  </div>
 
-      <div class="divider"></div>
-      <h2>04 — Filigrane et noms</h2>
-      <div class="field"><label>Texte du filigrane</label><input type="text" id="watermark" placeholder="Ex : © Ma marque"></div>
-      <div class="grid2">
-        <div class="field"><label>Position</label><select id="wmPosition"><option value="br">Bas droite</option><option value="bl">Bas gauche</option><option value="tr">Haut droite</option><option value="tl">Haut gauche</option><option value="center">Centre</option></select></div>
-        <div class="field"><label>Opacité</label><input type="range" id="wmOpacity" min="10" max="100" value="65"></div>
-      </div>
-      <div class="grid2">
-        <div class="field"><label>Préfixe</label><input type="text" id="prefix" placeholder="convertly_"></div>
-        <div class="field"><label>Suffixe</label><input type="text" id="suffix" placeholder="_final"></div>
-      </div>
-      <div class="actions">
-        <button class="secondary" onclick="resetSettings()">Réinitialiser les réglages</button>
-        <button class="primary" id="convertBtn">✦ Convertir les images</button>
-      </div>
-      <div class="notice">Tes images sont traitées directement dans ton navigateur. Elles ne sont pas envoyées sur un serveur. La conversion peut prendre quelques instants selon leur taille.</div>
-    </div>
+  <div class="field"><label>Préréglages réseaux sociaux</label>
+   <div class="presets">
+    <button class="ghost" data-preset="tiktok">TikTok</button>
+    <button class="ghost" data-preset="story">Story</button>
+    <button class="ghost" data-preset="insta">Instagram</button>
+    <button class="ghost" data-preset="square">Carré</button>
+    <button class="ghost" data-preset="youtube">YouTube</button>
+    <button class="ghost" data-preset="thumb">Miniature</button>
+   </div>
+  </div>
 
-    <div class="panel">
-      <h2>05 — Aperçu et résultats</h2>
-      <p>Visualise tes images converties et télécharge-les individuellement.</p>
-      <div id="emptyResults" style="text-align:center;padding:50px 10px;color:var(--muted)">
-        <div style="font-size:40px;margin-bottom:12px">✧</div>
-        <strong style="color:white">Ton espace de résultats</strong>
-        <p>Les fichiers convertis apparaîtront ici.</p>
-      </div>
-      <div class="results" id="results"></div>
-      <div class="actions">
-        <button class="secondary" onclick="clearResults()">Effacer les résultats</button>
-      </div>
-    </div>
-  </section>
+  <div class="controls">
+   <div class="field"><label>Largeur (px)</label><input id="width" type="number" placeholder="Originale"></div>
+   <div class="field"><label>Hauteur (px)</label><input id="height" type="number" placeholder="Originale"></div>
+   <div class="field"><label>Rotation</label>
+    <select id="rotate"><option value="0">0°</option><option value="90">90°</option><option value="180">180°</option><option value="270">270°</option></select>
+   </div>
+   <div class="field"><label>Filtre</label>
+    <select id="filter">
+     <option value="none">Aucun</option>
+     <option value="grayscale(1)">Noir et blanc</option>
+     <option value="sepia(1)">Sépia</option>
+     <option value="brightness(1.12) contrast(1.08) saturate(1.12)">Auto-améliorer</option>
+     <option value="contrast(1.2)">Contraste +</option>
+     <option value="saturate(1.5)">Couleurs +</option>
+     <option value="blur(1px)">Flou léger</option>
+    </select>
+   </div>
+  </div>
+
+  <div class="field">
+   <label>Qualité : <b id="qualityVal">85%</b></label>
+   <input id="quality" type="range" min="10" max="100" value="85">
+  </div>
+  <div class="field"><label>Filigrane</label><input id="watermark" type="text" placeholder="Ton texte ou ta marque"></div>
+  <div class="controls">
+   <div class="field"><label>Position du filigrane</label>
+    <select id="wmpos"><option value="br">Bas droite</option><option value="bl">Bas gauche</option><option value="center">Centre</option><option value="tr">Haut droite</option></select>
+   </div>
+   <div class="field"><label>Suffixe du fichier</label><input id="suffix" type="text" placeholder="_convertly"></div>
+  </div>
+  <div class="checks">
+   <label><input id="keep" type="checkbox" checked> Garder proportions</label>
+   <label><input id="enhance" type="checkbox"> Optimisation rapide</label>
+  </div>
+ </div>
+ </div>
+
+ <div class="card" style="margin-top:17px">
+  <h2>③ Comparaison avant / après</h2>
+  <div class="preview" id="preview"><div class="empty">Ajoute une image pour voir l'aperçu.</div></div>
+  <div class="field">
+   <label>Comparaison : <span id="compareVal">50%</span></label>
+   <input id="compareRange" type="range" min="0" max="100" value="50">
+  </div>
+ </div>
+</section>
+
+<section class="page" id="history">
+ <div class="top"><div><h1>Historique</h1><p>Tes dernières conversions.</p></div></div>
+ <div class="card">
+  <div id="historyList"><div class="empty">Aucune conversion enregistrée.</div></div>
+  <button class="ghost" id="clearHistory">Effacer l'historique</button>
+ </div>
+</section>
+
+<section class="page" id="settings">
+ <div class="top"><div><h1>Réglages</h1><p>Personnalise Convertly.</p></div></div>
+ <div class="card">
+  <h2>Préférences</h2>
+  <label><input id="remember" type="checkbox" checked> Mémoriser mes réglages</label>
+  <p class="note">Tes préférences restent sur cet appareil.</p>
+  <div class="actions">
+   <button id="saveSettings">Enregistrer</button>
+   <button class="ghost" id="resetSettings">Réinitialiser</button>
+  </div>
+ </div>
+ <div class="card" style="margin-top:15px">
+  <h2>À propos de Convertly</h2>
+  <p class="note">Convertly est un studio web de conversion d'images. La suppression automatique d'arrière-plan par IA n'est pas encore intégrée.</p>
+ </div>
+</section>
+
 </main>
 </div>
-<div id="toast" class="toast hidden"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
-const $ = id => document.getElementById(id);
-let selectedFiles = [];
-let convertedCount = 0;
-let savedBytes = 0;
-let resultsUrls = [];
+const $=id=>document.getElementById(id);
+let files=[],results=[];
+let history=JSON.parse(localStorage.getItem('cv-history')||'[]');
+let totalDone=0,savedBytes=0;
 
-function toast(message){
-  const el=$("toast");
-  el.textContent=message;el.classList.remove("hidden");
-  clearTimeout(window.toastTimer);
-  window.toastTimer=setTimeout(()=>el.classList.add("hidden"),2600);
-}
-function formatBytes(bytes){
-  if(bytes<1024)return bytes+" B";
-  if(bytes<1024*1024)return (bytes/1024).toFixed(1)+" KB";
-  return (bytes/1024/1024).toFixed(2)+" MB";
-}
-function updateStats(){
-  $("statFiles").textContent=selectedFiles.length;
-  $("statDone").textContent=convertedCount;
-  $("statSaved").textContent=formatBytes(Math.max(0,savedBytes));
-}
-function renderFiles(){
-  $("fileList").innerHTML="";
-  selectedFiles.forEach((file,index)=>{
-    const url=URL.createObjectURL(file);
-    const item=document.createElement("div");
-    item.className="file-item";
-    const img=document.createElement("img");img.src=url;
-    const info=document.createElement("div");info.className="file-info";
-    const name=document.createElement("strong");name.textContent=file.name;
-    const size=document.createElement("small");size.textContent=formatBytes(file.size);
-    info.append(name,size);
-    const remove=document.createElement("button");remove.className="remove";remove.textContent="×";
-    remove.onclick=()=>{selectedFiles.splice(index,1);renderFiles();updateStats();};
-    item.append(img,info,remove);$("fileList").append(item);
-  });
-  updateStats();
-}
-function addFiles(files){
-  let added=0;
-  for(const file of files){
-    if(!["image/jpeg","image/png","image/webp"].includes(file.type)){toast("Format non pris en charge : "+file.name);continue;}
-    if(selectedFiles.length>=20){toast("Maximum : 20 images.");break;}
-    if(selectedFiles.some(f=>f.name===file.name&&f.size===file.size))continue;
-    selectedFiles.push(file);added++;
-  }
-  renderFiles();
-  if(added)toast(added+" image(s) ajoutée(s).");
-}
-$("chooseBtn").onclick=()=>$("files").click();
-$("files").onchange=e=>{addFiles(e.target.files);e.target.value="";};
-const drop=$("dropzone");
-drop.ondragover=e=>{e.preventDefault();drop.classList.add("drag");};
-drop.ondragleave=()=>drop.classList.remove("drag");
-drop.ondrop=e=>{e.preventDefault();drop.classList.remove("drag");addFiles(e.dataTransfer.files);};
+setTimeout(()=>{
+ $('splash').style.opacity='0';
+ setTimeout(()=>$('splash').remove(),550);
+},1300);
 
-["quality","brightness","contrast","saturation","blur"].forEach(id=>{
-  $(id).oninput=()=>{
-    const suffix=id==="blur"?" px":"%";
-    $(id+"Out").textContent=$(id).value+suffix;
-  };
+document.querySelectorAll('[data-page]').forEach(b=>{
+ b.onclick=()=>{
+  document.querySelectorAll('[data-page]').forEach(x=>x.classList.toggle('active',x===b));
+  document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===b.dataset.page));
+  if(b.dataset.page==='history')renderHistory();
+ };
 });
 
-function loadImage(file){
-  return new Promise((resolve,reject)=>{
-    const url=URL.createObjectURL(file);
-    const img=new Image();
-    img.onload=()=>{URL.revokeObjectURL(url);resolve(img);};
-    img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error("Image illisible"));};
-    img.src=url;
-  });
-}
-function getDimensions(w,h){
-  let maxW=parseInt($("width").value)||w;
-  let maxH=parseInt($("height").value)||h;
-  maxW=Math.max(1,Math.min(10000,maxW));
-  maxH=Math.max(1,Math.min(10000,maxH));
-  const mode=$("resizeMode").value;
-  if(mode==="none")return {w,h};
-  if(mode==="cover"){
-    const scale=Math.max(maxW/w,maxH/h);
-    return {w:Math.round(w*scale),h:Math.round(h*scale),cropW:maxW,cropH:maxH,cover:true};
-  }
-  const scale=Math.min(1,maxW/w,maxH/h);
-  return {w:Math.round(w*scale),h:Math.round(h*scale)};
-}
-async function convertFile(file){
-  const img=await loadImage(file);
-  const rotation=Number($("rotation").value);
-  const swap=rotation===90||rotation===270;
-  const originalW=img.naturalWidth,originalH=img.naturalHeight;
-  const dims=getDimensions(swap?originalH:originalW,swap?originalW:originalH);
-  let outW=dims.w,outH=dims.h;
-  const canvas=document.createElement("canvas");
-  canvas.width=dims.cover?dims.cropW:outW;
-  canvas.height=dims.cover?dims.cropH:outH;
-  const ctx=canvas.getContext("2d");
-  const format=$("format").value;
-  if(format==="image/jpeg"){ctx.fillStyle=$("bgColor").value;ctx.fillRect(0,0,canvas.width,canvas.height);}
-  ctx.save();
-  const filters=[
-    $("grayscale").checked?"grayscale(100%)":"",
-    $("sepia").checked?"sepia(100%)":"",
-    `brightness(${$("brightness").value}%)`,
-    `contrast(${$("contrast").value}%)`,
-    `saturate(${$("saturation").value}%)`,
-    `blur(${$("blur").value}px)`
-  ].filter(Boolean).join(" ");
-  ctx.filter=filters;
-  ctx.translate(canvas.width/2,canvas.height/2);
-  if($("flipH").checked)ctx.scale(-1,1);
-  if($("flipV").checked)ctx.scale(1,-1);
-  ctx.rotate(rotation*Math.PI/180);
-  let drawW=outW,drawH=outH;
-  if(dims.cover){
-    const scale=Math.max(canvas.width/(swap?originalH:originalW),canvas.height/(swap?originalW:originalH));
-    drawW=originalW*scale;drawH=originalH*scale;
-  }
-  ctx.drawImage(img,-drawW/2,-drawH/2,drawW,drawH);
-  ctx.restore();
+$('choose').onclick=()=>$('files').click();
+$('files').onchange=e=>addFiles([...e.target.files]);
 
-  const watermark=$("watermark").value.trim();
-  if(watermark){
-    const size=Math.max(14,Math.round(canvas.width*.035));
-    ctx.save();
-    ctx.font=`bold ${size}px Arial`;
-    ctx.fillStyle=`rgba(255,255,255,${Number($("wmOpacity").value)/100})`;
-    ctx.shadowColor="#000";ctx.shadowBlur=4;
-    const pad=size*.7;
-    const tw=ctx.measureText(watermark).width;
-    let x=pad,y=canvas.height-pad;
-    const pos=$("wmPosition").value;
-    if(pos==="br"){x=canvas.width-tw-pad;y=canvas.height-pad;}
-    if(pos==="tr"){x=canvas.width-tw-pad;y=pad+size;}
-    if(pos==="tl"){x=pad;y=pad+size;}
-    if(pos==="center"){x=(canvas.width-tw)/2;y=canvas.height/2;}
-    ctx.fillText(watermark,x,y);ctx.restore();
-  }
-  const blob=await new Promise(resolve=>canvas.toBlob(resolve,format,Number($("quality").value)/100));
-  if(!blob)throw new Error("Conversion impossible");
-  return blob;
+function addFiles(list){
+ const room=20-files.length;
+ files.push(...list.filter(f=>f.type.startsWith('image/')).slice(0,room));
+ renderFiles();
+ $('convert').disabled=!files.length;
 }
-function safeName(name){
-  return name.replace(/\.[^.]+$/,"").replace(/[^\w\-À-ÿ]+/g,"_");
-}
-$("convertBtn").onclick=async()=>{
-  if(!selectedFiles.length){toast("Ajoute d'abord une image.");return;}
-  const btn=$("convertBtn");btn.disabled=true;btn.textContent="Conversion en cours…";
-  $("emptyResults").classList.add("hidden");
-  let success=0;
-  for(const file of selectedFiles){
-    try{
-      const blob=await convertFile(file);
-      const url=URL.createObjectURL(blob);resultsUrls.push(url);
-      const ext=$("format").value==="image/jpeg"?"jpg":$("format").value.split("/")[1];
-      const name=$("prefix").value+safeName(file.name)+$("suffix").value+"."+ext;
-      showResult(file,blob,url,name);
-      convertedCount++;savedBytes+=file.size-blob.size;success++;
-      updateStats();
-    }catch(error){toast("Erreur avec "+file.name+": "+error.message);}
-  }
-  btn.disabled=false;btn.textContent="✦ Convertir les images";
-  toast(success+" image(s) convertie(s) !");
+
+const drop=$('drop');
+drop.ondragover=e=>{e.preventDefault();drop.classList.add('over')};
+drop.ondragleave=()=>drop.classList.remove('over');
+drop.ondrop=e=>{
+ e.preventDefault();drop.classList.remove('over');
+ addFiles([...e.dataTransfer.files]);
 };
-function showResult(original,blob,url,name){
-  const card=document.createElement("div");card.className="result";
-  const head=document.createElement("div");head.className="result-head";
-  const info=document.createElement("div");
-  const title=document.createElement("strong");title.textContent=name;title.style.fontSize="12px";
-  const sizes=document.createElement("small");sizes.textContent=formatBytes(original.size)+" → "+formatBytes(blob.size);
-  info.append(title,document.createElement("br"),sizes);
-  const link=document.createElement("a");link.className="download";link.href=url;link.download=name;link.textContent="↓ Télécharger";
-  head.append(info,link);
-  const img=document.createElement("img");img.src=url;img.alt="Aperçu de "+name;
-  card.append(head,img);$("results").prepend(card);
+
+function renderFiles(){
+ $('count').textContent=files.length+' / 20';
+ $('filelist').innerHTML='';
+ files.forEach((f,i)=>{
+  const url=URL.createObjectURL(f);
+  const el=document.createElement('div');
+  el.className='fileitem';
+  el.innerHTML='<img class="thumb"><div class="fileinfo"><b></b><span></span></div><button class="ghost">Retirer</button>';
+  el.querySelector('img').src=url;
+  el.querySelector('b').textContent=f.name;
+  el.querySelector('span').textContent=(f.size/1024).toFixed(1)+' KB';
+  el.querySelector('button').onclick=()=>{
+   files.splice(i,1);renderFiles();$('convert').disabled=!files.length;
+  };
+  $('filelist').append(el);
+ });
 }
-function clearResults(){
-  resultsUrls.forEach(URL.revokeObjectURL);resultsUrls=[];
-  $("results").innerHTML="";convertedCount=0;savedBytes=0;
-  $("emptyResults").classList.remove("hidden");updateStats();
+
+$('quality').oninput=()=>{
+ $('qualityVal').textContent=$('quality').value+'%';
+ persist();
+};
+
+document.querySelectorAll('[data-preset]').forEach(b=>{
+ b.onclick=()=>{
+  const p={
+   tiktok:[1080,1920],story:[1080,1920],
+   insta:[1080,1350],square:[1080,1080],
+   youtube:[1920,1080],thumb:[1280,720]
+  }[b.dataset.preset];
+  $('width').value=p[0];$('height').value=p[1];
+  $('keep').checked=false;persist();
+ };
+});
+
+function persist(){
+ if(!$('remember').checked)return;
+ let s={};
+ ['format','width','height','rotate','filter','quality','watermark','wmpos','suffix','keep','enhance'].forEach(k=>{
+  s[k]=$(k).type==='checkbox'?$(k).checked:$(k).value;
+ });
+ localStorage.setItem('cv-settings',JSON.stringify(s));
 }
-function resetSettings(){
-  $("format").value="image/webp";$("resizeMode").value="none";
-  $("width").value="";$("height").value="";$("quality").value=85;
-  $("rotation").value=0;$("bgColor").value="#ffffff";
-  $("flipH").checked=false;$("flipV").checked=false;
-  $("grayscale").checked=false;$("sepia").checked=false;
-  $("brightness").value=100;$("contrast").value=100;
-  $("saturation").value=100;$("blur").value=0;
-  $("watermark").value="";$("wmOpacity").value=65;
-  $("prefix").value="";$("suffix").value="";
-  ["quality","brightness","contrast","saturation","blur"].forEach(id=>$(id).dispatchEvent(new Event("input")));
-  toast("Réglages réinitialisés.");
+
+function loadSettings(){
+ try{
+  const s=JSON.parse(localStorage.getItem('cv-settings')||'{}');
+  Object.keys(s).forEach(k=>{
+   if($(k)){
+    if($(k).type==='checkbox')$(k).checked=s[k];
+    else $(k).value=s[k];
+   }
+  });
+  $('qualityVal').textContent=$('quality').value+'%';
+ }catch(e){}
 }
-function resetAll(){
-  selectedFiles=[];renderFiles();clearResults();resetSettings();
+loadSettings();
+
+async function loadImage(file){
+ return new Promise((resolve,reject)=>{
+  const im=new Image();
+  im.onload=()=>resolve(im);
+  im.onerror=reject;
+  im.src=URL.createObjectURL(file);
+ });
 }
+
+async function convertOne(file){
+ const im=await loadImage(file);
+ let w=Number($('width').value)||im.width;
+ let h=Number($('height').value)||im.height;
+ const rot=Number($('rotate').value);
+ const ratio=Math.min(w/im.width,h/im.height,1);
+
+ if($('keep').checked){
+  w=Math.round(im.width*ratio);
+  h=Math.round(im.height*ratio);
+ }
+ if(rot===90||rot===270)[w,h]=[h,w];
+
+ const c=document.createElement('canvas');
+ c.width=w;c.height=h;
+ const ctx=c.getContext('2d');
+ ctx.translate(w/2,h/2);
+ ctx.rotate(rot*Math.PI/180);
+ ctx.filter=$('filter').value==='none'?'none':$('filter').value;
+
+ const dw=(rot===90||rot===270)?h:w;
+ const dh=(rot===90||rot===270)?w:h;
+ ctx.drawImage(im,-dw/2,-dh/2,dw,dh);
+ ctx.filter='none';
+
+ if($('enhance').checked){
+  const d=ctx.getImageData(0,0,w,h);
+  for(let i=0;i<d.data.length;i+=4){
+   d.data[i]=Math.min(255,d.data[i]*1.04+2);
+   d.data[i+1]=Math.min(255,d.data[i+1]*1.04+2);
+   d.data[i+2]=Math.min(255,d.data[i+2]*1.04+2);
+  }
+  ctx.putImageData(d,0,0);
+ }
+
+ const mark=$('watermark').value.trim();
+ if(mark){
+  const pad=Math.max(14,w*.025);
+  ctx.font=`bold ${Math.max(18,w*.035)}px Arial`;
+  ctx.fillStyle='rgba(255,255,255,.85)';
+  ctx.shadowColor='#000';ctx.shadowBlur=4;
+  let x=pad,y=h-pad;
+  if($('wmpos').value==='br')x=w-pad-ctx.measureText(mark).width;
+  if($('wmpos').value==='tr'){x=w-pad-ctx.measureText(mark).width;y=pad+24}
+  if($('wmpos').value==='center'){x=(w-ctx.measureText(mark).width)/2;y=h/2}
+  ctx.fillText(mark,x,y);
+ }
+
+ const mime=$('format').value;
+ const quality=Number($('quality').value)/100;
+ const blob=await new Promise(resolve=>c.toBlob(resolve,mime,mime==='image/png'?undefined:quality));
+ if(!blob)throw new Error('Conversion impossible');
+
+ const ext=mime==='image/jpeg'?'jpg':mime.split('/')[1];
+ const name=file.name.replace(/\.[^.]+$/,'')+($('suffix').value||'')+'.'+ext;
+
+ return {
+  name,blob,original:file.size,
+  url:URL.createObjectURL(blob),
+  before:URL.createObjectURL(file)
+ };
+}
+
+$('convert').onclick=async()=>{
+ if(!files.length)return;
+ $('convert').disabled=true;
+ $('convert').textContent='Conversion…';
+ results=[];
+ savedBytes=0;
+
+ for(const f of files){
+  try{
+   const r=await convertOne(f);
+   results.push(r);
+   savedBytes+=f.size-r.blob.size;
+  }catch(e){console.error(e)}
+ }
+
+ totalDone+=results.length;
+ $('done').textContent=totalDone;
+ $('saved').textContent=(savedBytes/1024).toFixed(1)+' KB';
+ $('zip').disabled=!results.length;
+ renderResults();
+
+ history.unshift({
+  date:new Date().toLocaleString('fr-BE'),
+  count:results.length,
+  format:$('format').value.split('/')[1].toUpperCase(),
+  saved:(savedBytes/1024).toFixed(1)+' KB'
+ });
+ history=history.slice(0,30);
+ localStorage.setItem('cv-history',JSON.stringify(history));
+
+ $('convert').textContent='Convertir ↗';
+ $('convert').disabled=!files.length;
+};
+
+function renderResults(){
+ results.forEach(r=>{
+  const el=document.createElement('div');
+  el.className='fileitem';
+  el.innerHTML='<img class="thumb"><div class="fileinfo"><b></b><span></span></div><a><button>Télécharger</button></a>';
+  el.querySelector('img').src=r.url;
+  el.querySelector('b').textContent=r.name;
+  el.querySelector('span').textContent=(r.blob.size/1024).toFixed(1)+' KB';
+  const a=el.querySelector('a');
+  a.href=r.url;a.download=r.name;
+  $('filelist').append(el);
+ });
+ if(results[0])showPreview(results[0]);
+}
+
+function showPreview(r){
+ $('preview').innerHTML='<div class="compare"><img id="beforeImg"><div class="after" id="after"><img id="afterImg"></div></div>';
+ $('beforeImg').src=r.before;
+ $('afterImg').src=r.url;
+ $('afterImg').style.width=$('beforeImg').getBoundingClientRect().width+'px';
+ $('compareRange').oninput=()=>{
+  const v=$('compareRange').value;
+  $('after').style.width=v+'%';
+  $('compareVal').textContent=v+'%';
+ };
+ $('compareRange').oninput();
+}
+
+$('zip').onclick=async()=>{
+ if(!window.JSZip){alert('La création ZIP nécessite une connexion internet.');return}
+ const zip=new JSZip();
+ results.forEach(r=>zip.file(r.name,r.blob));
+ const blob=await zip.generateAsync({type:'blob'});
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);
+ a.download='convertly-images.zip';
+ a.click();
+};
+
+$('clear').onclick=()=>{
+ files=[];results=[];
+ $('filelist').innerHTML='';
+ $('preview').innerHTML='<div class="empty">Ajoute une image pour voir l’aperçu.</div>';
+ $('count').textContent='0 / 20';
+ $('convert').disabled=true;
+ $('zip').disabled=true;
+};
+
+function renderHistory(){
+ $('historyList').innerHTML='';
+ if(!history.length){
+  $('historyList').innerHTML='<div class="empty">Aucune conversion enregistrée.</div>';
+  return;
+ }
+ history.forEach(h=>{
+  const d=document.createElement('div');
+  d.className='history-row';
+  d.textContent=`${h.date} · ${h.count} image(s) · ${h.format} · ${h.saved} économisés`;
+  $('historyList').append(d);
+ });
+}
+
+$('clearHistory').onclick=()=>{
+ history=[];
+ localStorage.removeItem('cv-history');
+ renderHistory();
+};
+
+$('saveSettings').onclick=()=>{
+ persist();alert('Préférences enregistrées.');
+};
+$('resetSettings').onclick=()=>{
+ localStorage.removeItem('cv-settings');
+ location.reload();
+};
+$('remember').onchange=()=>{
+ if(!$('remember').checked)localStorage.removeItem('cv-settings');
+ else persist();
+};
+
+['format','width','height','rotate','filter','watermark','wmpos','suffix','keep','enhance'].forEach(id=>{
+ $(id).addEventListener('change',persist);
+});
 </script>
 </body>
 </html>
-
