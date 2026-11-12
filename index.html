@@ -4,187 +4,325 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Convertly - Image Converter</title>
+<title>Convertly — Image Converter</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#101322;color:#f5f6ff;font-family:Arial,sans-serif;padding:24px 15px}
-main{max-width:650px;margin:auto}
-header{text-align:center;margin:25px 0 30px}
-.logo{font-size:38px;font-weight:900;color:#8b7cff}
-h1{font-size:32px;margin:8px 0}
-p{color:#aeb3c8;line-height:1.5}
-.panel{background:#1b2034;border:1px solid #343b58;border-radius:18px;padding:20px;margin:16px 0}
-label{display:block;font-weight:bold;margin:15px 0 8px}
-input,select,button{width:100%;padding:13px;border-radius:10px;border:1px solid #454c68;background:#111629;color:white;font-size:15px}
-input[type=file]{padding:12px}
-input[type=range]{padding:0;accent-color:#8b7cff}
-button{background:#7968f5;border:0;font-weight:bold;cursor:pointer;margin-top:18px}
-button:disabled{opacity:.5}
-#preview{max-width:100%;max-height:260px;display:none;margin:15px auto;border-radius:12px}
-#status{white-space:pre-line;margin-top:15px;color:#c9c5ff}
-#download{display:none;text-align:center;background:#263e35;padding:14px;border-radius:10px;color:#a8ffd2;text-decoration:none;margin-top:15px;font-weight:bold}
-.small{font-size:13px;color:#929ab4}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-footer{text-align:center;color:#777f9b;font-size:12px;margin:30px 0}
+:root {
+  color-scheme: dark;
+  font-family: Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #0b1020;
+  color: #f5f6ff;
+  padding: 28px 16px;
+}
+main { max-width: 900px; margin: auto; }
+header { text-align: center; margin: 25px 0 35px; }
+.logo { color: #a78bfa; font-size: 15px; font-weight: bold; letter-spacing: 3px; }
+h1 { font-size: clamp(34px, 7vw, 54px); margin: 12px 0; }
+header p { color: #a7b0ca; }
+.panel {
+  background: #151d32;
+  border: 1px solid #293653;
+  border-radius: 20px;
+  padding: 22px;
+  margin-bottom: 18px;
+}
+.drop {
+  border: 2px dashed #6553b8;
+  background: #1b2340;
+  border-radius: 15px;
+  padding: 30px 15px;
+  text-align: center;
+}
+.drop strong { display: block; font-size: 19px; margin-bottom: 8px; }
+input, select, button {
+  font: inherit;
+}
+input[type=file] { max-width: 100%; margin-top: 15px; }
+.settings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 18px;
+  margin-top: 22px;
+}
+label { display: block; color: #cbd3e8; font-size: 14px; }
+select, input[type=number] {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #394969;
+  background: #0e172a;
+  color: white;
+}
+input[type=range] { width: 100%; margin-top: 15px; }
+button, .download {
+  border: 0;
+  background: #8064ed;
+  color: white;
+  border-radius: 11px;
+  padding: 13px 20px;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+button:disabled { opacity: .45; cursor: not-allowed; }
+.primary { width: 100%; margin-top: 22px; }
+#status { color: #c2c9dc; margin-top: 15px; text-align: center; }
+#results { display: grid; gap: 13px; }
+.result {
+  display: grid;
+  grid-template-columns: 85px 1fr;
+  gap: 15px;
+  align-items: center;
+  background: #1b2740;
+  border: 1px solid #30405f;
+  border-radius: 13px;
+  padding: 12px;
+}
+.result img {
+  width: 85px;
+  height: 85px;
+  object-fit: cover;
+  border-radius: 9px;
+  background: #0b1020;
+}
+.result p { color: #aab5d0; font-size: 13px; margin: 7px 0; overflow-wrap: anywhere; }
+.result .download { padding: 9px 12px; font-size: 13px; }
+.small { color: #96a3c1; font-size: 13px; }
+footer { text-align: center; color: #7f8ba9; font-size: 12px; margin: 30px 0; }
 </style>
 </head>
 <body>
 <main>
 <header>
-<div class="logo">✦ CONVERTLY</div>
-<h1>Image Converter</h1>
-<p>Convertis, compresse et redimensionne tes images gratuitement.</p>
+  <div class="logo">CONVERTLY</div>
+  <h1>Vos images. <span style="color:#a78bfa">Votre format.</span></h1>
+  <p>Convertissez, compressez et redimensionnez vos images gratuitement.</p>
 </header>
 
 <section class="panel">
-<h2>1. Choisis une image</h2>
-<input id="file" type="file" accept="image/*">
-<img id="preview" alt="Aperçu de ton image">
-<p id="fileInfo" class="small">Aucune image sélectionnée.</p>
+  <div class="drop">
+    <strong>Choisissez vos images</strong>
+    <span class="small">Jusqu'à 20 images · Traitement directement sur votre appareil</span>
+    <br>
+    <input id="files" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+  </div>
+
+  <div class="settings">
+    <label>Format de sortie
+      <select id="format">
+        <option value="image/webp">WebP</option>
+        <option value="image/jpeg">JPG</option>
+        <option value="image/png">PNG</option>
+      </select>
+    </label>
+    <label>Largeur maximale (pixels)
+      <input id="width" type="number" min="1" max="12000" value="1920">
+    </label>
+    <label>Qualité : <span id="qualityValue">85</span>%
+      <input id="quality" type="range" min="10" max="100" value="85">
+    </label>
+  </div>
+
+  <button class="primary" id="convert">Convertir mes images</button>
+  <div id="status" role="status">Sélectionnez vos images pour commencer.</div>
 </section>
 
 <section class="panel">
-<h2>2. Personnalise la conversion</h2>
-<label for="format">Format de sortie</label>
-<select id="format">
-<option value="image/jpeg">JPG</option>
-<option value="image/png">PNG</option>
-<option value="image/webp">WebP</option>
-</select>
-
-<label for="quality">Qualité : <span id="qualityValue">80</span>%</label>
-<input id="quality" type="range" min="10" max="100" value="80">
-
-<label for="width">Largeur maximale (pixels)</label>
-<input id="width" type="number" min="1" max="10000" placeholder="Ex : 1200 (vide = original)">
-
-<p class="small">La hauteur sera ajustée automatiquement pour conserver les proportions.</p>
-<button id="convert" disabled>Convertir mon image</button>
-<p id="status"></p>
-<a id="download" download="convertly-image">⬇ Télécharger mon image</a>
+  <h2>Résultats</h2>
+  <p class="small" id="summary">Vos images converties apparaîtront ici.</p>
+  <div id="results"></div>
 </section>
 
-<footer>Convertly © 2026 · Tes images sont traitées dans ton navigateur.</footer>
+<footer>Convertly · Gratuit · Sans compte · Vos images restent sur votre appareil</footer>
 </main>
 
 <script>
-const fileInput = document.getElementById("file");
-const preview = document.getElementById("preview");
-const fileInfo = document.getElementById("fileInfo");
-const format = document.getElementById("format");
-const quality = document.getElementById("quality");
-const qualityValue = document.getElementById("qualityValue");
-const widthInput = document.getElementById("width");
-const convertButton = document.getElementById("convert");
-const status = document.getElementById("status");
-const download = document.getElementById("download");
+const filesInput = document.getElementById('files');
+const formatInput = document.getElementById('format');
+const widthInput = document.getElementById('width');
+const qualityInput = document.getElementById('quality');
+const qualityValue = document.getElementById('qualityValue');
+const convertButton = document.getElementById('convert');
+const statusBox = document.getElementById('status');
+const results = document.getElementById('results');
+const summary = document.getElementById('summary');
 
-let selectedFile = null;
-let image = new Image();
-let previewURL = null;
-let outputURL = null;
+qualityInput.addEventListener('input', () => {
+  qualityValue.textContent = qualityInput.value;
+});
 
-fileInput.addEventListener("change", () => {
-  const file = fileInput.files[0];
-  if (!file) return;
+function formatSize(bytes) {
+  if (bytes < 1024) return bytes + ' octets';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' Ko';
+  return (bytes / (1024 * 1024)).toFixed(2) + ' Mo';
+}
 
-  if (!file.type.startsWith("image/")) {
-    status.textContent = "Choisis un fichier image valide.";
+function extensionFor(type) {
+  return type === 'image/jpeg' ? 'jpg' :
+         type === 'image/png' ? 'png' : 'webp';
+}
+
+function loadImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => resolve({ img, url });
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Image illisible'));
+    };
+    img.src = url;
+  });
+}
+
+function canvasBlob(canvas, type, quality) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => {
+      if (blob) resolve(blob);
+      else reject(new Error('Conversion impossible'));
+    }, type, quality);
+  });
+}
+
+filesInput.addEventListener('change', () => {
+  const count = filesInput.files.length;
+  if (count > 20) {
+    filesInput.value = '';
+    statusBox.textContent = 'Maximum : 20 images par conversion.';
+    return;
+  }
+  statusBox.textContent = count
+    ? count + ' image(s) sélectionnée(s).'
+    : 'Sélectionnez vos images pour commencer.';
+});
+
+convertButton.addEventListener('click', async () => {
+  const files = Array.from(filesInput.files);
+  if (!files.length) {
+    statusBox.textContent = 'Choisissez au moins une image.';
+    return;
+  }
+  if (files.length > 20) {
+    statusBox.textContent = 'Maximum : 20 images.';
     return;
   }
 
-  selectedFile = file;
-  if (previewURL) URL.revokeObjectURL(previewURL);
-  previewURL = URL.createObjectURL(file);
-  image = new Image();
+  const maxWidth = Number(widthInput.value);
+  if (!Number.isInteger(maxWidth) || maxWidth < 1 || maxWidth > 12000) {
+    statusBox.textContent = 'Entrez une largeur entre 1 et 12000 pixels.';
+    return;
+  }
 
-  image.onload = () => {
-    preview.src = previewURL;
-    preview.style.display = "block";
-    fileInfo.textContent =
-      `${file.name} · ${(file.size / 1024).toFixed(1)} Ko · ${image.width} × ${image.height} px`;
-    convertButton.disabled = false;
-    status.textContent = "";
-    download.style.display = "none";
-  };
+  const type = formatInput.value;
+  const quality = Number(qualityInput.value) / 100;
+  const extension = extensionFor(type);
 
-  image.onerror = () => {
-    status.textContent = "Impossible de lire cette image.";
-  };
-
-  image.src = previewURL;
-});
-
-quality.addEventListener("input", () => {
-  qualityValue.textContent = quality.value;
-});
-
-convertButton.addEventListener("click", () => {
-  if (!selectedFile || !image.naturalWidth) return;
-
+  results.replaceChildren();
+  summary.textContent = 'Conversion en cours…';
   convertButton.disabled = true;
-  status.textContent = "Conversion en cours...";
 
-  try {
-    const maxWidth = Number(widthInput.value);
-    const originalWidth = image.naturalWidth;
-    const originalHeight = image.naturalHeight;
+  let success = 0;
+  let totalBefore = 0;
+  let totalAfter = 0;
 
-    const newWidth = maxWidth > 0
-      ? Math.min(maxWidth, originalWidth)
-      : originalWidth;
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    statusBox.textContent = 'Conversion ' + (i + 1) + ' sur ' + files.length + '…';
 
-    const newHeight = Math.round(
-      originalHeight * newWidth / originalWidth
-    );
-
-    const canvas = document.createElement("canvas");
-    canvas.width = newWidth;
-    canvas.height = newHeight;
-
-    const context = canvas.getContext("2d");
-
-    if (format.value === "image/jpeg") {
-      context.fillStyle = "#ffffff";
-      context.fillRect(0, 0, newWidth, newHeight);
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      addError(file.name, 'Format non pris en charge.');
+      continue;
     }
 
-    context.drawImage(image, 0, 0, newWidth, newHeight);
+    let loaded;
+    try {
+      loaded = await loadImage(file);
+      const { img, url } = loaded;
+      const ratio = Math.min(1, maxWidth / img.naturalWidth);
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(img.naturalWidth * ratio));
+      canvas.height = Math.max(1, Math.round(img.naturalHeight * ratio));
 
-    canvas.toBlob(blob => {
-      if (!blob) {
-        status.textContent = "Erreur pendant la conversion.";
-        convertButton.disabled = false;
-        return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Canvas indisponible');
+      if (type === 'image/jpeg') {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-      if (outputURL) URL.revokeObjectURL(outputURL);
-      outputURL = URL.createObjectURL(blob);
+      const blob = await canvasBlob(canvas, type, quality);
+      const outputUrl = URL.createObjectURL(blob);
+      const baseName = file.name.replace(/\.[^.]+$/, '') || 'image';
+      const outputName = baseName + '-convertly.' + extension;
 
-      const extension = format.value.split("/")[1];
-      download.href = outputURL;
-      download.download = `convertly-image.${extension}`;
-      download.style.display = "block";
-
-      const before = (selectedFile.size / 1024).toFixed(1);
-      const after = (blob.size / 1024).toFixed(1);
-      const saved = ((1 - blob.size / selectedFile.size) * 100).toFixed(1);
-
-      status.textContent =
-        `Conversion terminée !\n` +
-        `Avant : ${before} Ko\n` +
-        `Après : ${after} Ko\n` +
-        `Variation : ${saved}%\n` +
-        `Dimensions : ${newWidth} × ${newHeight} px`;
-
-      convertButton.disabled = false;
-    }, format.value, Number(quality.value) / 100);
-
-  } catch (error) {
-    status.textContent = "Une erreur est survenue. Essaie une autre image.";
-    convertButton.disabled = false;
+      addResult(file, blob, outputUrl, outputName, canvas.width, canvas.height);
+      success++;
+      totalBefore += file.size;
+      totalAfter += blob.size;
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      if (loaded) URL.revokeObjectURL(loaded.url);
+      addError(file.name, error.message || 'Erreur de conversion.');
+    }
   }
+
+  summary.textContent = success + ' image(s) convertie(s) avec succès.';
+  statusBox.textContent = 'Terminé ! ' + success + ' / ' + files.length + ' réussie(s).';
+  if (success) {
+    summary.textContent += ' Taille totale : ' + formatSize(totalBefore) +
+      ' → ' + formatSize(totalAfter) + '.';
+  }
+  convertButton.disabled = false;
 });
+
+function addResult(file, blob, url, name, width, height) {
+  const card = document.createElement('article');
+  card.className = 'result';
+
+  const img = document.createElement('img');
+  img.src = url;
+  img.alt = 'Aperçu de ' + name;
+
+  const details = document.createElement('div');
+  const title = document.createElement('strong');
+  title.textContent = name;
+
+  const info = document.createElement('p');
+  info.textContent = formatSize(file.size) + ' → ' + formatSize(blob.size) +
+    ' · ' + width + ' × ' + height + ' px';
+
+  const link = document.createElement('a');
+  link.className = 'download';
+  link.href = url;
+  link.download = name;
+  link.textContent = 'Télécharger';
+
+  details.append(title, info, link);
+  card.append(img, details);
+  results.append(card);
+}
+
+function addError(name, message) {
+  const card = document.createElement('article');
+  card.className = 'result';
+  const details = document.createElement('div');
+  const title = document.createElement('strong');
+  title.textContent = name;
+  const info = document.createElement('p');
+  info.textContent = message;
+  details.append(title, info);
+  card.append(details);
+  results.append(card);
+}
 </script>
 </body>
 </html>
+
